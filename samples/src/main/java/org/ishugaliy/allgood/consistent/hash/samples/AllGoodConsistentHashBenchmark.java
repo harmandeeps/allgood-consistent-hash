@@ -27,6 +27,11 @@ public class AllGoodConsistentHashBenchmark
         defaultKeyNodeMap.put("d", ring.locate("d").get());
         defaultKeyNodeMap.put("e", ring.locate("e").get());
         defaultKeyNodeMap.put("f", ring.locate("f").get());
+        //defaultKeyNodeMap.put("g", ring.locate("g").get());
+
+        for (String key : defaultKeyNodeMap.keySet()) {
+            System.out.println("Key: " + key + " Value: " + defaultKeyNodeMap.get(key).getKey());
+        }
     }
 
     public void RunBenchMark()

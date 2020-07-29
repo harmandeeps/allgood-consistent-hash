@@ -30,7 +30,11 @@ public class ClusterManager
         defaultKeyNodeMap.put("d", ring.get(this.getNodeIndex(ring, "d", GuavaCases.SIMPLE)));
         defaultKeyNodeMap.put("e", ring.get(this.getNodeIndex(ring, "e", GuavaCases.SIMPLE)));
         defaultKeyNodeMap.put("f", ring.get(this.getNodeIndex(ring, "f", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("g", ring.get(this.getNodeIndex(ring, "g", GuavaCases.SIMPLE)));
+        //defaultKeyNodeMap.put("g", ring.get(this.getNodeIndex(ring, "g", GuavaCases.SIMPLE)));
+
+        for (String key : defaultKeyNodeMap.keySet()) {
+            System.out.println("Key: " + key + " Value: " + defaultKeyNodeMap.get(key).getName());
+        }
     }
 
     private void GuavaConsistentHashing()
@@ -90,6 +94,7 @@ public class ClusterManager
         System.out.println();
 
         System.out.print("Add node:     ");
+        ring.clear();
         ring.add(new SimpleNode("node0", NodeState.RUNNING));
         ring.add(new SimpleNode("node1", NodeState.RUNNING));
         ring.add(new SimpleNode("node4", NodeState.RUNNING));
@@ -100,6 +105,7 @@ public class ClusterManager
         System.out.println();
 
         System.out.print("Delete node:  ");
+        ring.clear();
         ring.add(new SimpleNode("node0", NodeState.RUNNING));
         ring.add(new SimpleNode("node1", NodeState.RUNNING));
         ring.add(new SimpleNode("node2", NodeState.RUNNING));
