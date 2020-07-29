@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ClusterManager
 {
-    static int REQUEST_COUNT = 7;
+    static int REQUEST_COUNT = 10000;
     Map<String, SimpleNode> defaultKeyNodeMap;
     List<SimpleNode> ring;
 
@@ -24,16 +25,11 @@ public class ClusterManager
         ring.add(new SimpleNode("node2", NodeState.RUNNING));
         ring.add(new SimpleNode("node3", NodeState.RUNNING));
         defaultKeyNodeMap = new HashMap<>();
-        defaultKeyNodeMap.put("a", ring.get(this.getNodeIndex(ring, "a", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("b", ring.get(this.getNodeIndex(ring, "b", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("c", ring.get(this.getNodeIndex(ring, "c", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("d", ring.get(this.getNodeIndex(ring, "d", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("e", ring.get(this.getNodeIndex(ring, "e", GuavaCases.SIMPLE)));
-        defaultKeyNodeMap.put("f", ring.get(this.getNodeIndex(ring, "f", GuavaCases.SIMPLE)));
-        //defaultKeyNodeMap.put("g", ring.get(this.getNodeIndex(ring, "g", GuavaCases.SIMPLE)));
 
-        for (String key : defaultKeyNodeMap.keySet()) {
-            System.out.println("Key: " + key + " Value: " + defaultKeyNodeMap.get(key).getName());
+        for(int i=0; i<REQUEST_COUNT; i++)
+        {
+            String key = UUID.randomUUID().toString();
+            defaultKeyNodeMap.put(key, ring.get(this.getNodeIndex(ring, key, GuavaCases.SIMPLE)));
         }
     }
 

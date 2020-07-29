@@ -6,10 +6,11 @@ import org.ishugaliy.allgood.consistent.hash.node.SimpleNode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class AllGoodConsistentHashBenchmark
 {
-    static int REQUEST_COUNT = 7;
+    static int REQUEST_COUNT = 10000;
     Map<String, SimpleNode> defaultKeyNodeMap;
     ConsistentHash<SimpleNode> ring;
 
@@ -21,16 +22,11 @@ public class AllGoodConsistentHashBenchmark
         ring.add(SimpleNode.of("node2"));
         ring.add(SimpleNode.of("node3"));
         defaultKeyNodeMap = new HashMap<>();
-        defaultKeyNodeMap.put("a", ring.locate("a").get());
-        defaultKeyNodeMap.put("b", ring.locate("b").get());
-        defaultKeyNodeMap.put("c", ring.locate("c").get());
-        defaultKeyNodeMap.put("d", ring.locate("d").get());
-        defaultKeyNodeMap.put("e", ring.locate("e").get());
-        defaultKeyNodeMap.put("f", ring.locate("f").get());
-        //defaultKeyNodeMap.put("g", ring.locate("g").get());
 
-        for (String key : defaultKeyNodeMap.keySet()) {
-            System.out.println("Key: " + key + " Value: " + defaultKeyNodeMap.get(key).getKey());
+        for(int i=0; i<REQUEST_COUNT; i++)
+        {
+            String key = UUID.randomUUID().toString();
+            defaultKeyNodeMap.put(key, ring.locate(key).get());
         }
     }
 
