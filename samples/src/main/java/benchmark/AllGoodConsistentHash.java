@@ -94,6 +94,6 @@ public class AllGoodConsistentHash
     @Override
     public String getBenchmarkName()
     {
-        return new String("All Good Consistent Hash");
+        return "All Good Consistent Hash";
     }
 }

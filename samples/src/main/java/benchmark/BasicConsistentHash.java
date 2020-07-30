@@ -59,20 +59,24 @@ public class BasicConsistentHash
     public void addNodes()
     {
         count++;
+        int previousSize = ring.size();
         ring.addAll(IntStream.range(0, nodesDelta)
                 .mapToObj(i -> new SimpleNode("192.168." + count + "." + i, NodeState.RUNNING))
                 .collect(Collectors.toList()));
+        assert ring.size() == (previousSize+nodesDelta);
         //System.out.println("add nodes: " + ring.size());
     }
 
     @Override
     public void deleteNodes()
     {
+        int previousSize = ring.size();
         // remove some nodes from the ring
         Random rand = new Random();
         for (int i = 0; i < nodesDelta; i++) {
             ring.remove(ring.get(rand.nextInt(ring.size() - 1)));
         }
+        assert ring.size() == (previousSize-nodesDelta);
     }
 
     @Override
@@ -91,7 +95,7 @@ public class BasicConsistentHash
     @Override
     public String getBenchmarkName()
     {
-        return new String("Basic Consistent Hash");
+        return "Basic Consistent Hash";
     }
 
     public int getNodeIndex(String key)

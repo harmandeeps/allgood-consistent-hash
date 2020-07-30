@@ -19,6 +19,7 @@ public class AdvanceConsistentHash
     @Override
     public void deleteNodes()
     {
+        long previousSize = ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.RUNNING)).count();
         // remove some nodes from the ring
         Random rand = new Random();
         for (int i = 0; i < nodesDelta; i++) {
@@ -32,6 +33,8 @@ public class AdvanceConsistentHash
             ring.add(nodeIndex, changeNode);
         }
         //System.out.println("delete nodes: " + ring.size());
+        assert ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.RUNNING)).count()
+                == (previousSize-nodesDelta);
     }
 
     public int getNodeIndex(String key)
@@ -69,6 +72,6 @@ public class AdvanceConsistentHash
     @Override
     public String getBenchmarkName()
     {
-        return new String("Advance Consistent Hash");
+        return "Advance Consistent Hash";
     }
 }
