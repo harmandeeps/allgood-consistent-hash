@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import org.ishugaliy.allgood.consistent.hash.node.SimpleNode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ public class BasicConsistentHash
     protected int nodesDelta = 20;
     protected Map<String, SimpleNode> defaultKeyNodeMap;
     protected List<SimpleNode> ring;
+    private int count=1;
 
     public BasicConsistentHash(int nodesCount, int nodesDelta)
     {
@@ -34,6 +36,12 @@ public class BasicConsistentHash
                 .collect(Collectors.toList());
 
         defaultKeyNodeMap = new HashMap<>();
+        locateKeys(requests);
+    }
+
+    @Override
+    public void locateKeys(List<String> requests)
+    {
         for(String request : requests)
         {
             defaultKeyNodeMap.put(request, ring.get(this.getNodeIndex(request)));
@@ -50,9 +58,11 @@ public class BasicConsistentHash
     @Override
     public void addNodes()
     {
-        ring.addAll(IntStream.range(nodesCount, nodesCount+ nodesDelta)
-                .mapToObj(i -> new SimpleNode("192.168.1." + i, NodeState.RUNNING))
+        count++;
+        ring.addAll(IntStream.range(0, nodesDelta)
+                .mapToObj(i -> new SimpleNode("192.168." + count + "." + i, NodeState.RUNNING))
                 .collect(Collectors.toList()));
+        //System.out.println("add nodes: " + ring.size());
     }
 
     @Override
@@ -70,6 +80,12 @@ public class BasicConsistentHash
     {
         return defaultKeyNodeMap.get(key).getName().equals(
                 ring.get(getNodeIndex(key)).getName());
+    }
+
+    @Override
+    public int getRingSize()
+    {
+        return ring.size();
     }
 
     @Override

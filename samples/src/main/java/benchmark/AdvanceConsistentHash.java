@@ -23,10 +23,15 @@ public class AdvanceConsistentHash
         Random rand = new Random();
         for (int i = 0; i < nodesDelta; i++) {
             int nodeIndex = rand.nextInt(ring.size() - 1);
+            while(ring.get(nodeIndex).getNodeState() != NodeState.RUNNING)
+            {
+                nodeIndex = rand.nextInt(ring.size() - 1);
+            }
             SimpleNode changeNode = ring.remove(nodeIndex);
             changeNode.setNodeState(NodeState.STOPPED);
             ring.add(nodeIndex, changeNode);
         }
+        //System.out.println("delete nodes: " + ring.size());
     }
 
     public int getNodeIndex(String key)
@@ -52,6 +57,13 @@ public class AdvanceConsistentHash
             }
         }
         return nodeIndex;
+    }
+
+    @Override
+    public int getRingSize()
+    {
+        return ring.size();
+        //return (int) ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.RUNNING)).count();
     }
 
     @Override

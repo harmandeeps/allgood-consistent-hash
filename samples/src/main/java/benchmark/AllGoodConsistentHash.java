@@ -13,8 +13,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.ishugaliy.allgood.consistent.hash.samples.ClusterManager.NODES_COUNT;
-
 public class AllGoodConsistentHash
     implements Benchmark
 {
@@ -22,6 +20,7 @@ public class AllGoodConsistentHash
     protected int nodesDelta = 20;
     private Map<String, SimpleNode> defaultKeyNodeMap;
     private ConsistentHash<SimpleNode> ring;
+    private int count=1;
 
     public AllGoodConsistentHash(int nodesCount, int nodesDelta)
     {
@@ -34,11 +33,18 @@ public class AllGoodConsistentHash
     {
         ring = HashRing.<SimpleNode>newBuilder()
                 .hasher(DefaultHasher.MURMUR_3)
-                .nodes(IntStream.range(0, NODES_COUNT)
+                //.partitionRate(10000)
+                .nodes(IntStream.range(0, nodesCount)
                         .mapToObj(i -> SimpleNode.of("192.168.1." + i))
                         .collect(Collectors.toSet()))
                 .build();
         defaultKeyNodeMap = new HashMap<>();
+        locateKeys(requests);
+    }
+
+    @Override
+    public void locateKeys(List<String> requests)
+    {
         for(String request : requests)
         {
             defaultKeyNodeMap.put(request, ring.locate(request).get());
@@ -55,8 +61,9 @@ public class AllGoodConsistentHash
     @Override
     public void addNodes()
     {
+        count++;
         ring.addAll(IntStream.range(nodesCount, nodesCount+ nodesDelta)
-                .mapToObj(i -> SimpleNode.of("192.168.1." + i))
+                .mapToObj(i -> SimpleNode.of("192.168." + count + "." + i))
                 .collect(Collectors.toList()));
     }
 
@@ -76,6 +83,12 @@ public class AllGoodConsistentHash
     {
         return defaultKeyNodeMap.get(key).getKey().equals(
                 ring.locate(key).get().getKey());
+    }
+
+    @Override
+    public int getRingSize()
+    {
+        return ring.getNodes().size();
     }
 
     @Override

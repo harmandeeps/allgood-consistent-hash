@@ -7,9 +7,9 @@ import java.util.UUID;
 public class BenchmarkRunner
 {
     private static int REQUEST_COUNT = 10_000;
-    protected static int NODES_COUNT = 100;
-    protected static int NODES_DELTA = 20;
-    private List<String> requests;
+    protected static int NODES_COUNT = 20;
+    protected static int NODES_DELTA = 5;
+    private static List<String> requests;
 
     public BenchmarkRunner()
     {
@@ -23,8 +23,6 @@ public class BenchmarkRunner
 
     private void runTest(Benchmark benchmark)
     {
-        System.out.println("\n--------------------");
-        benchmark.initialize(requests);
         System.out.println("\nVerifying if equals working fine");
         getMissCountAndPrint(benchmark);
         System.out.println();
@@ -34,18 +32,21 @@ public class BenchmarkRunner
         System.out.print("Replace node: ");
         benchmark.replaceNodes();
         getMissCountAndPrint(benchmark);
+        //benchmark.locateKeys(requests);
 
         System.out.println();
 
         System.out.print("Add node:     ");
         benchmark.addNodes();
         getMissCountAndPrint(benchmark);
+        //benchmark.locateKeys(requests);
 
         System.out.println();
 
         System.out.print("Delete node:  ");
         benchmark.deleteNodes();
         getMissCountAndPrint(benchmark);
+        benchmark.locateKeys(requests);
     }
 
     private void getMissCountAndPrint(Benchmark benchmark)
@@ -59,7 +60,7 @@ public class BenchmarkRunner
         }
         float timeTaken = (float) (System.currentTimeMillis() - start) / 1000;
 
-        System.out.print(" Miss count: " + missCount);
+        System.out.print(String.format(" Size: %d, Miss count: %s", benchmark.getRingSize(), missCount));
         System.out.print(String.format(" , Miss count (%%): %.2f, Total Time Taken: %f sec",
                 (missCount / REQUEST_COUNT) * 100, timeTaken));
     }
@@ -68,13 +69,17 @@ public class BenchmarkRunner
     public static void main(String[] args)
     {
         BenchmarkRunner benchmarkRunner = new BenchmarkRunner();
-        BasicConsistentHash basicConsistentHash = new BasicConsistentHash(NODES_COUNT, NODES_DELTA);
-        benchmarkRunner.runTest(basicConsistentHash);
-
+//        BasicConsistentHash basicConsistentHash = new BasicConsistentHash(NODES_COUNT, NODES_DELTA);
+//        benchmarkRunner.runTest(basicConsistentHash);
         AdvanceConsistentHash advanceConsistentHash = new AdvanceConsistentHash(NODES_COUNT, NODES_DELTA);
-        benchmarkRunner.runTest(advanceConsistentHash);
-
         AllGoodConsistentHash allGoodConsistentHash = new AllGoodConsistentHash(NODES_COUNT, NODES_DELTA);
-        benchmarkRunner.runTest(allGoodConsistentHash);
+
+        advanceConsistentHash.initialize(requests);
+        allGoodConsistentHash.initialize(requests);
+
+        for(int i=0; i<21; i++) {
+            benchmarkRunner.runTest(advanceConsistentHash);
+            benchmarkRunner.runTest(allGoodConsistentHash);
+        }
     }
 }
