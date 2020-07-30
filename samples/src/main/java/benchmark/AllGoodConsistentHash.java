@@ -32,8 +32,8 @@ public class AllGoodConsistentHash
     public void initialize(List<String> requests)
     {
         ring = HashRing.<SimpleNode>newBuilder()
-                .hasher(DefaultHasher.MURMUR_3)
-                //.partitionRate(10000)
+                .hasher(DefaultHasher.METRO_HASH)
+                .partitionRate(5)
                 .nodes(IntStream.range(0, nodesCount)
                         .mapToObj(i -> SimpleNode.of("192.168.1." + i))
                         .collect(Collectors.toSet()))
