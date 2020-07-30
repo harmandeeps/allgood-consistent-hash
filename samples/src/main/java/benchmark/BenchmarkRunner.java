@@ -11,7 +11,7 @@ public class BenchmarkRunner
     private static int REQUEST_COUNT = 10_000;
     protected static int NODES_COUNT = 20;
     protected static int NODES_DELTA = 5;
-    protected static int runs = 50;
+    protected static int runs = 51;
     private static List<String> requests;
     private Map<String, Map<Actions, Double>> metric;
 

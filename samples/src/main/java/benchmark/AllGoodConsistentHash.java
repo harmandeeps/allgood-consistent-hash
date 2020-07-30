@@ -31,9 +31,17 @@ public class AllGoodConsistentHash
     @Override
     public void initialize(List<String> requests)
     {
+        // murmur
+        //  ---- Metrics for: All Good Consistent Hash ----
+        //Action: REPLACE, MissRate: 33.23
+        //Action: INSERT, MissRate: 19.89
+        //Action: DELETE, MissRate: 19.83
+        // ---- Metrics for: Advance Consistent Hash ----
+        //Action: REPLACE, MissRate: 43.82
+        //Action: INSERT, MissRate: 30.26
+        //Action: DELETE, MissRate: 17.13
         ring = HashRing.<SimpleNode>newBuilder()
-                .hasher(DefaultHasher.METRO_HASH)
-                .partitionRate(5)
+                .hasher(DefaultHasher.MURMUR_3)
                 .nodes(IntStream.range(0, nodesCount)
                         .mapToObj(i -> SimpleNode.of("192.168.1." + i))
                         .collect(Collectors.toSet()))

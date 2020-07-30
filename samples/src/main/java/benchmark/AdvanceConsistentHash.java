@@ -20,6 +20,7 @@ public class AdvanceConsistentHash
     public void deleteNodes()
     {
         long previousSize = ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.RUNNING)).count();
+        long prevStopped = ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.STOPPED)).count();
         // remove some nodes from the ring
         Random rand = new Random();
         for (int i = 0; i < nodesDelta; i++) {
@@ -35,6 +36,8 @@ public class AdvanceConsistentHash
         //System.out.println("delete nodes: " + ring.size());
         assert ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.RUNNING)).count()
                 == (previousSize-nodesDelta);
+        assert ring.stream().filter(simpleNode -> simpleNode.getNodeState().equals(NodeState.STOPPED)).count()-prevStopped
+                == (nodesDelta);
     }
 
     public int getNodeIndex(String key)
