@@ -44,14 +44,17 @@ public class BenchmarkRunner
         benchmark.replaceNodes();
         getMissCountAndPrint(benchmark, Actions.REPLACE);
         benchmark.locateKeys(requests);
+        getMissCountAndPrint(benchmark, Actions.VERIFY);
 
         benchmark.addNodes();
         getMissCountAndPrint(benchmark, Actions.INSERT);
         benchmark.locateKeys(requests);
+        getMissCountAndPrint(benchmark, Actions.VERIFY);
 
         benchmark.deleteNodes();
         getMissCountAndPrint(benchmark, Actions.DELETE);
         benchmark.locateKeys(requests);
+        getMissCountAndPrint(benchmark, Actions.VERIFY);
     }
 
     private void getMissCountAndPrint(Benchmark benchmark, Actions action)
