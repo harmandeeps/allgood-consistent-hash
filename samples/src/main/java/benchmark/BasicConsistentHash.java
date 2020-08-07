@@ -4,8 +4,8 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
-import org.ishugaliy.allgood.consistent.hash.node.SimpleNode;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,7 @@ public class BasicConsistentHash
     protected int nodesCount = 100;
     protected int nodesDelta = 20;
     protected Map<String, SimpleNode> defaultKeyNodeMap;
+    private Map<SimpleNode, Integer> nodeToKeyMap;
     protected List<SimpleNode> ring;
     private int count=1;
 
@@ -36,15 +37,19 @@ public class BasicConsistentHash
                 .collect(Collectors.toList());
 
         defaultKeyNodeMap = new HashMap<>();
+        nodeToKeyMap = new HashMap<>();
         locateKeys(requests);
     }
 
     @Override
     public void locateKeys(List<String> requests)
     {
+        nodeToKeyMap.clear();
         for(String request : requests)
         {
-            defaultKeyNodeMap.put(request, ring.get(this.getNodeIndex(request)));
+            SimpleNode simpleNode = ring.get(this.getNodeIndex(request));
+            defaultKeyNodeMap.put(request, simpleNode);
+            nodeToKeyMap.put(simpleNode, nodeToKeyMap.getOrDefault(simpleNode, 0)+1);
         }
     }
 
@@ -96,6 +101,12 @@ public class BasicConsistentHash
     public String getBenchmarkName()
     {
         return "Basic Consistent Hash";
+    }
+
+    @Override
+    public Collection<Integer> getNodeLoadList()
+    {
+        return nodeToKeyMap.values();
     }
 
     public int getNodeIndex(String key)

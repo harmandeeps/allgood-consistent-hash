@@ -6,6 +6,7 @@ import org.ishugaliy.allgood.consistent.hash.hasher.DefaultHasher;
 import org.ishugaliy.allgood.consistent.hash.node.SimpleNode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class AllGoodConsistentHash
     protected int nodesCount = 100;
     protected int nodesDelta = 20;
     private Map<String, SimpleNode> defaultKeyNodeMap;
+    private Map<SimpleNode, Integer> nodeToKeyMap;
     private ConsistentHash<SimpleNode> ring;
     private int count=1;
 
@@ -31,15 +33,6 @@ public class AllGoodConsistentHash
     @Override
     public void initialize(List<String> requests)
     {
-        // murmur
-        //  ---- Metrics for: All Good Consistent Hash ----
-        //Action: REPLACE, MissRate: 33.23
-        //Action: INSERT, MissRate: 19.89
-        //Action: DELETE, MissRate: 19.83
-        // ---- Metrics for: Advance Consistent Hash ----
-        //Action: REPLACE, MissRate: 43.82
-        //Action: INSERT, MissRate: 30.26
-        //Action: DELETE, MissRate: 17.13
         ring = HashRing.<SimpleNode>newBuilder()
                 .hasher(DefaultHasher.MURMUR_3)
                 .nodes(IntStream.range(0, nodesCount)
@@ -47,15 +40,19 @@ public class AllGoodConsistentHash
                         .collect(Collectors.toSet()))
                 .build();
         defaultKeyNodeMap = new HashMap<>();
+        nodeToKeyMap = new HashMap<>();
         locateKeys(requests);
     }
 
     @Override
     public void locateKeys(List<String> requests)
     {
+        nodeToKeyMap.clear();
         for(String request : requests)
         {
-            defaultKeyNodeMap.put(request, ring.locate(request).get());
+            SimpleNode simpleNode = ring.locate(request).get();
+            defaultKeyNodeMap.put(request, simpleNode);
+            nodeToKeyMap.put(simpleNode, nodeToKeyMap.getOrDefault(simpleNode, 0)+1);
         }
     }
 
@@ -103,5 +100,11 @@ public class AllGoodConsistentHash
     public String getBenchmarkName()
     {
         return "All Good Consistent Hash";
+    }
+
+    @Override
+    public Collection<Integer> getNodeLoadList()
+    {
+        return nodeToKeyMap.values();
     }
 }

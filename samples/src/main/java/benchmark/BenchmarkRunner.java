@@ -1,6 +1,7 @@
 package benchmark;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ public class BenchmarkRunner
 {
     private static int REQUEST_COUNT = 10_000;
     protected static int NODES_COUNT = 20;
-    protected static int NODES_DELTA = 5;
+    protected static int NODES_DELTA = 15;
     protected static int runs = 51;
     private static List<String> requests;
     private Map<String, Map<Actions, Double>> metric;
@@ -85,6 +86,33 @@ public class BenchmarkRunner
         metric.put(benchmark.getBenchmarkName(), metricMap);
     }
 
+    private void printStandardDeviation(Benchmark benchmark) {
+        Collection<Integer> nodeLoadList = benchmark.getNodeLoadList();
+        System.out.println("\n"+benchmark.getBenchmarkName());
+        double avg = calculateArithmeticMean(nodeLoadList);
+        double dispersion = calculateDispersion(nodeLoadList, avg);
+        double standDev = Math.round(Math.sqrt(dispersion));
+        double standDevPercent = Math.round(standDev / avg * 100);
+        System.out.println("arithmetic mean: [" + avg + "] load per node");
+        System.out.println("stan. deviation: [" + standDev + "] load per node - " + standDevPercent + "%");
+    }
+
+    private double calculateDispersion(Collection<Integer> nodeLoadList, double avg) {
+        double deviation = 0;
+        for (Integer cnt : nodeLoadList) {
+            deviation += Math.pow(avg - cnt, 2);
+        }
+        return Math.round(deviation / nodeLoadList.size());
+    }
+
+    private double calculateArithmeticMean(Collection<Integer> nodeLoadList) {
+        float sum = 0;
+        for (Integer cnt : nodeLoadList) {
+            sum += cnt;
+        }
+        return Math.round(sum / nodeLoadList.size());
+    }
+
 
     public static void main(String[] args)
     {
@@ -114,5 +142,8 @@ public class BenchmarkRunner
             System.out.println(String.format("Action: %s, MissRate: %.2f", Actions.DELETE.name(),
                     benchmarkRunner.metric.get(benchmark).get(Actions.DELETE)/(runs*REQUEST_COUNT)*100));
         }
+
+        benchmarkRunner.printStandardDeviation(advanceConsistentHash);
+        benchmarkRunner.printStandardDeviation(allGoodConsistentHash);
     }
 }

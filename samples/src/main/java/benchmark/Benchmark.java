@@ -1,5 +1,6 @@
 package benchmark;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface Benchmark
@@ -12,4 +13,5 @@ public interface Benchmark
     boolean isSameNode(String key);
     int getRingSize();
     String getBenchmarkName();
+    Collection<Integer> getNodeLoadList();
 }
